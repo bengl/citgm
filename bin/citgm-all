@@ -29,6 +29,11 @@ app
     'Use the lookup table provided at <path>'
   )
   .option(
+    '-p, --parallel <number>',
+    'How many tests to run in parallel',
+    os.cpus().length || 1
+  )
+  .option(
     '-d, --nodedir <path>',
     'Path to the node source to use when compiling native addons'
   )
@@ -156,7 +161,7 @@ function filterLookup(result, value, key) {
 function launch() {
   var collection = _.reduce(lookup, filterLookup, []);
 
-  var q = async.queue(runTask, os.cpus().length || 1);
+  var q = async.queue(runTask, app.parallel);
   q.push(collection);
   q.drain = function done () {
     q.drain = null;
